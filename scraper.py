@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 import requests
 
+# All GEC country codes for the CIA website urls
 gec_codes = ["AF","AX","AL","AG","AQ","AN","AO","AV","AY"
             "AC","AR","AM","AA","AT","AS","AU","AJ","BF",
             "BA","FQ","BG","BB","BS","BO","BE","BH","BN",
@@ -33,15 +34,57 @@ gec_codes = ["AF","AX","AL","AG","AQ","AN","AO","AV","AY"
             "VE","VM","VQ","WQ","WF","WE","WI","YM","ZA",
             "ZI"]
 
-URL = "https://www.cia.gov/library/publications/the-world-factbook/geos/af.html"
-htmldoc = requests.get(URL)
-
-soup = BeautifulSoup(htmldoc.content, 'html.parser')
-
-all_expands = soup.find(attrs={"class": "expandcollapse"})
+# List of the fact categories for each country
 section_titles = ["geography", "people-and-society", "government", "economy", "transnational-issues"]
 
-last_country = 0
-last_section = 0
+last_country = -1
+last_section = -1
 
+cur_country = last_country + 1
+cur_section = last_country + 1
+
+# Setup for bs4
+URL = "https://www.cia.gov/library/publications/the-world-factbook/geos/" +\
+        gec_codes[cur_country] + ".html"
+htmldoc = requests.get(URL)
+soup = BeautifulSoup(htmldoc.content, 'html.parser')
+
+# Find the container of the facts
+all_expands = soup.find(attrs={"class": "expandcollapse"})
+category = all_expands.find(id=section_titles[cur_section] + "-category-section")
+
+# Functions to scrape and parse respective section
+
+def getGeo(section):
+    fields = ["location", "geographic-coordinates", "area",
+            "land-boundaries", "climate", "terrain", "natural-hazards"]
+
+
+def getSoc(section):
+    pass
+
+
+def getGov(section):
+    pass
+
+
+def getEco(section):
+    pass
+
+
+def getIss(section):
+    pass
+
+
+# Determine which fact catergory to show
+if cur_section == 0:
+    getGeo(category)
+elif cur_section == 1:
+    getSoc(category)
+elif cur_section == 2:
+    getGov(category)
+elif cur_section == 3:
+    getEco(category)
+else:
+    getIss(category)
 
