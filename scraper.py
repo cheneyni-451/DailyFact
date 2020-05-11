@@ -45,7 +45,7 @@ cur_section = last_country + 1
 
 # Setup for bs4
 URL = "https://www.cia.gov/library/publications/the-world-factbook/geos/" +\
-        gec_codes[cur_country] + ".html"
+        gec_codes[cur_country].lower() + ".html"
 htmldoc = requests.get(URL)
 soup = BeautifulSoup(htmldoc.content, 'html.parser')
 
@@ -58,6 +58,20 @@ category = all_expands.find(id=section_titles[cur_section] + "-category-section"
 def getGeo(section):
     fields = ["location", "geographic-coordinates", "area",
             "land-boundaries", "climate", "terrain", "natural-hazards"]
+    # Everything except land-boundaries, the fact is the first child of the field
+    # land-boundaries fact is second child
+
+    facts = ""
+
+    for field in fields:
+        f = section.find(id="field-" + field)
+        if field == "land-boundaries":
+
+            facts += f.contents[3].get_text().strip() + "\n"
+        else:
+            facts += f.contents[1].get_text().strip() + "\n"
+    
+    return facts
 
 
 def getSoc(section):
@@ -78,7 +92,7 @@ def getIss(section):
 
 # Determine which fact catergory to show
 if cur_section == 0:
-    getGeo(category)
+    print(getGeo(category))
 elif cur_section == 1:
     getSoc(category)
 elif cur_section == 2:
