@@ -39,10 +39,30 @@ gec_codes = [
 # List of the fact categories for each country
 section_titles = ["geography", "people-and-society", "government", "economy", "transnational-issues"]
 
-last_country = -1
+last_country = 0
 last_section = -1
+try:
+    fin = open("last_fact.txt", "r")
+    fin.close()
+except IOError:
+    fin = open("last_fact.txt", "w")
+    fin.close()
 
-cur_country = last_country + 1
+fin = open("last_fact.txt", "r")
+read_data = fin.readline()
+if read_data:  # if read_data is not empty
+    split_str = read_data.split()
+    last_country = int(split_str[0])
+    last_section = int(split_str[1])
+    if last_section == len(section_titles) - 1:
+        last_section = -1
+        last_country += 1
+    if last_country == len(gec_codes):
+        last_country = 0
+
+fin.close()
+
+cur_country = last_country
 cur_section = last_section + 1
 
 # Setup for bs4
@@ -130,7 +150,7 @@ def get_gov(section):
         f = section.find(id="field-" + field)
         if f:
             if field == "country-name":
-                facts += f.contents[11].get_text(" ", strip=True) + "\n"
+                facts += f.contents[len(f.contents) - 2].get_text(" ", strip=True) + "\n"
             else:
                 facts += f.contents[1].get_text(" ", strip=True) + "\n"
 
@@ -184,3 +204,6 @@ elif cur_section == 3:
 else:
     print(get_iss(category))
 
+fout = open("last_fact.txt", "w")
+fout.write(str(cur_country) + " " + str(cur_section) + '\n')
+fout.close()
