@@ -58,6 +58,12 @@ category = all_expands.find(id=section_titles[cur_section] + "-category-section"
 
 # Functions to scrape and parse respective section
 def get_geo(section):
+    """
+    Scrapes the geographic data
+
+    :param section: the soup object that contains the geographic data
+    :return: the formatted facts as a string
+    """
     fields = [
         "location", "geographic-coordinates", "area",
         "land-boundaries", "climate", "terrain", "natural-hazards"
@@ -79,6 +85,12 @@ def get_geo(section):
 
 
 def get_soc(section):
+    """
+    Scrapes the people and society section
+
+    :param section: the soup object that contains the people and society data
+    :return: the formatted facts as a string
+    """
     fields = [
         "population", "languages", "age-structure", "median-age",
         "net-migration-rate", "life-expectancy-at-birth", "literacy"
@@ -101,15 +113,63 @@ def get_soc(section):
 
 
 def get_gov(section):
-    pass
+    """
+    Scrapes the government section
+
+    :param section: the soup object that contains the government data
+    :return: the formatted facts as a string
+    """
+    fields = [
+        "country-name", "government-type", "administrative-divisions",
+        "independence", "national-symbol-s", "national-anthem"
+    ]
+
+    facts = ""
+
+    for field in fields:
+        f = section.find(id="field-" + field)
+        if f:
+            if field == "country-name":
+                facts += f.contents[11].get_text(" ", strip=True) + "\n"
+            else:
+                facts += f.contents[1].get_text(" ", strip=True) + "\n"
+
+    return facts
 
 
 def get_eco(section):
-    pass
+    """
+    Scrapes the economy section
+
+    :param section: the soup object that contains the economy data
+    :return: the formatted facts as a string
+    """
+    fields = [
+        "agriculture-products", "industries", "labor-force",
+        "unemployment-rate", "population-below-poverty-line"
+    ]
+
+    facts = ""
+
+    for field in fields:
+        f = section.find(id="field-" + field)
+        if f:
+            facts += f.contents[1].get_text(" ", strip=True) + "\n"
+
+    return facts
 
 
 def get_iss(section):
-    pass
+    """
+    Scrapes the transnational issues data
+    :param section: the soup object that contains the transnational issues data
+    :return: the formatted facts as a string
+    """
+    f = section.contents
+    facts = ""
+    for i in range(3, len(f), 4):
+        facts += f[i].get_text(" ", strip=True) + "\n"
+    return facts
 
 
 # Determine which fact category to show
